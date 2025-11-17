@@ -790,7 +790,7 @@ let onTouch = function(btn, e){
       Bangle.musicControl("next");
     } else {
       // Middle third = play/pause
-      Bangle.musicControl("play");
+      Bangle.musicControl("playpause");
     }
     return;
   }
