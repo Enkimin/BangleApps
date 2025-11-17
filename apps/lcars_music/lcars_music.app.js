@@ -836,12 +836,6 @@ Bangle.setUI({mode:"clock",remove:function() {
     widget_utils.cleanup();
 }});
 Bangle.loadWidgets();
-
-// Goad Gadgetbridge into sending current track info (like simplemusic does)
-Bangle.musicControl("volumeup");
-Bangle.musicControl("volumedown");
-
 // Clear the screen once, at startup and draw clock
 g.setTheme({bg:"#000",fg:"#fff",dark:true}).clear();
 draw();
-}
