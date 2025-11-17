@@ -524,13 +524,13 @@ let drawPosition1 = function(){
     // Artist/Author - centered, larger
     g.setColor(cWhite);
     g.setFontAlign(0, -1, 0);
-    let artist = lastMusicInfo.artist || lastMusicInfo.album || "";
+    let artist = (lastMusicInfo.artist || lastMusicInfo.album || "").toString();
     if (artist.length > 18) artist = artist.substring(0, 18) + "...";
     if (artist) g.drawString(artist, 88, 70);
     
     // Track/Chapter - centered, larger
     g.setColor(color3);
-    let track = lastMusicInfo.track || "";
+    let track = (lastMusicInfo.track || "").toString();
     if (track.length > 18) track = track.substring(0, 18) + "...";
     if (track) g.drawString(track, 88, 95);
     
