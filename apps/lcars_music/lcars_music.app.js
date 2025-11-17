@@ -521,9 +521,6 @@ let drawPosition1 = function(){
   g.setColor(color2);
   g.setFontAlign(0, -1, 0);
   
-  // Title - centered
-  g.drawString("AUDIO INTERFACE", 88, 50);
-
   // Music info (if available)
   if (lastMusicInfo && (lastMusicInfo.artist || lastMusicInfo.track)) {
     // Artist - centered, larger
@@ -531,13 +528,13 @@ let drawPosition1 = function(){
     g.setFontAlign(0, -1, 0);
     let artist = lastMusicInfo.artist || "Unknown Artist";
     if (artist.length > 18) artist = artist.substring(0, 18) + "...";
-    g.drawString(artist, 88, 90);
+    g.drawString(artist, 88, 70);
     
     // Track - centered, larger
     g.setColor(color3);
     let track = lastMusicInfo.track || "Unknown Track";
     if (track.length > 18) track = track.substring(0, 18) + "...";
-    g.drawString(track, 88, 110);
+    g.drawString(track, 88, 90);
     
     // Progress bar - centered and wider
     if (lastMusicInfo.dur && lastMusicInfo.c) {
@@ -546,9 +543,9 @@ let drawPosition1 = function(){
       let barX = (176 - barWidth) / 2;
       
       g.setColor(color1);
-      g.fillRect(barX, 130, barX + Math.round(progress * barWidth), 140);
+      g.fillRect(barX, 110, barX + Math.round(progress * barWidth), 120);
       g.setColor(cGrey);
-      g.fillRect(barX + Math.round(progress * barWidth), 130, barX + barWidth, 140);
+      g.fillRect(barX + Math.round(progress * barWidth), 110, barX + barWidth, 120);
       
       // Time display
       let currentTime = Math.floor(lastMusicInfo.c / 60) + ":" + 
@@ -556,13 +553,13 @@ let drawPosition1 = function(){
       let totalTime = Math.floor(lastMusicInfo.dur / 60) + ":" + 
                      ("0" + Math.floor(lastMusicInfo.dur % 60)).substr(-2);
       g.setColor(cWhite);
-      g.drawString(currentTime + " / " + totalTime, 88, 150);
+      g.drawString(currentTime + " / " + totalTime, 88, 130);
     }
   } else {
     g.setColor(cGrey);
     g.setFontAlign(0, -1, 0);
-    g.drawString("NO MUSIC", 88, 90);
-    g.drawString("PLAYING", 88, 110);
+    g.drawString("NO MUSIC", 88, 70);
+    g.drawString("PLAYING", 88, 90);
   }
   
   // Touch zone instructions
