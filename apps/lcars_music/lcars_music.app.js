@@ -672,9 +672,13 @@ let getAlarmMinutes = function(){
       return -1;
   }
 
-  let alarm = require('sched');
-  let alarmObj =  alarm.getAlarm(TIMER_IDX);
-  return Math.round(alarm.getTimeToAlarm(alarmObj)/(60*1000));
+  try{
+    let alarm = require('sched');
+    let alarmObj =  alarm.getAlarm(TIMER_IDX);
+    return Math.round(alarm.getTimeToAlarm(alarmObj)/(60*1000));
+  } catch(ex){ 
+    return -1; 
+  }
 };
 
 let increaseAlarm = function(){
@@ -832,7 +836,7 @@ Bangle.setUI({mode:"clock",remove:function() {
     Bangle.removeListener("touch",onTouch);
     Bangle.removeListener("musicstate",onMusicState);
     Bangle.removeListener("musictrack",onMusicTrack);
-    require('sched').setAlarm(TIMER_IDX, undefined);
+    try{ require('sched').setAlarm(TIMER_IDX, undefined); } catch(ex){ }
     g.setTheme(themeBefore);
     widget_utils.cleanup();
 }});
