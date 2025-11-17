@@ -3,7 +3,7 @@
   "name": "LCARS Music",
   "shortName":"LCARS Music",
   "icon": "lcars.png",
-  "version":"2.4",
+  "version":"2.5",
   "readme": "README.md",
   "supports": ["BANGLEJS2"],
   "description": "LCARS clock with music control. Screen 2 shows current track and provides play/pause/next/previous controls via Gadgetbridge.",

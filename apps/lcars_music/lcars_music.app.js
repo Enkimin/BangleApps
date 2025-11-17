@@ -511,8 +511,7 @@ let drawPosition1 = function(){
   let offset = settings.fullscreen ? 0 : 24;
   g.drawImage(bgLeft, 0, offset);
   
-  // Single LCARS border around music area
-  drawHorizontalBgLine(color2, 30, 146, 90, 4);
+  // Clean music area - no extra lines
 
   // Music Control Interface - cleaner layout (v1.7 - title removed)
   g.setFontAntonioMedium();
