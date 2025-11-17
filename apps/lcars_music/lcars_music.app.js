@@ -796,38 +796,25 @@ let onTouch = function(btn, e){
 // Touch gestures to control clock. We don't use swipe to be compatible with the bangle ecosystem
 Bangle.on('touch', onTouch);
 
-// Music event handlers (using message system like simplemusic)
-let onMusicMessage = function(type, message) {
-  if (type.includes("music") && !message.handled) {
-    if (!lastMusicInfo) lastMusicInfo = {};
-    
-    // Debug: Show what we received (temporary)
-    console.log("Music message:", type, message);
-    
-    // Update track info
-    if (message.track) lastMusicInfo.track = message.track;
-    if (message.artist) lastMusicInfo.artist = message.artist;
-    if (message.album) lastMusicInfo.album = message.album;
-    if (message.dur) lastMusicInfo.dur = message.dur;
-    if (message.c) lastMusicInfo.c = message.c;
-    if (message.position) lastMusicInfo.c = message.position;
-    if (message.state) lastMusicInfo.state = message.state;
-    
-    // Handle case where we have minimal info but we know something is playing
-    if (message.state === "play" && !lastMusicInfo.artist && !lastMusicInfo.track) {
-      lastMusicInfo.artist = "Audio";
-      lastMusicInfo.track = "Playing";
-    }
-    
-    if (lcarsViewPos === 1) {
-      draw();
-    }
-    
-    message.handled = true;
+// Music event handlers - back to working approach
+let onMusicState = function(state) {
+  if (!lastMusicInfo) lastMusicInfo = {};
+  lastMusicInfo.state = state;
+  
+  if (lcarsViewPos === 1) {
+    draw();
   }
 };
 
-Bangle.on("message", onMusicMessage);
+let onMusicTrack = function(track) {
+  lastMusicInfo = track;
+  if (lcarsViewPos === 1) {
+    draw();
+  }
+};
+
+Bangle.on('musicstate', onMusicState);
+Bangle.on('musictrack', onMusicTrack);
 
 let themeBefore = g.theme;
 /*
@@ -842,7 +829,8 @@ Bangle.setUI({mode:"clock",remove:function() {
     Bangle.removeListener("lock",onLock);
     Bangle.removeListener("charging",onCharge);
     Bangle.removeListener("touch",onTouch);
-    Bangle.removeListener("message",onMusicMessage);
+    Bangle.removeListener("musicstate",onMusicState);
+    Bangle.removeListener("musictrack",onMusicTrack);
     try{ require('sched').setAlarm(TIMER_IDX, undefined); } catch(ex){ }
     g.setTheme(themeBefore);
     widget_utils.cleanup();
