@@ -507,62 +507,68 @@ let drawPosition0 = function(){
 let lastMusicInfo = null;
 
 let drawPosition1 = function(){
-  // Draw background image
+  // Use the LEFT panel layout for a cleaner single-panel look
   let offset = settings.fullscreen ? 0 : 24;
-  g.drawImage(bgRight, 149, offset);
-  if(settings.fullscreen){
-    drawHorizontalBgLine(color1, 0, 140, offset, 4);
-  }
-  drawHorizontalBgLine(color3, 0, 80, 80, 4);
-  drawHorizontalBgLine(color3, 90, 150, 80, 4);
-  drawHorizontalBgLine(color2, 0, 50, 87, 4);
-  drawHorizontalBgLine(color2, 60, 140, 87, 4);
-  drawHorizontalBgLine(color2, 0, 150, 171, 5);
-
-  // Music Control Interface
-  g.setFontAntonioMedium();
-  g.setColor(cWhite);
-  g.setFontAlign(-1, -1, 0);
+  g.drawImage(bgLeft, 0, offset);
   
-  // Title
-  g.drawString("AUDIO CONTROL", 10, 25);
+  // Single unified panel background
+  drawHorizontalBgLine(color1, 25, 150, offset, 4);
+  drawHorizontalBgLine(color2, 20, 155, 40, 4);
+  drawHorizontalBgLine(color3, 25, 150, 80, 4);
+
+  // Music Control Interface - cleaner layout
+  g.setFontAntonioMedium();
+  g.setColor(color2);
+  g.setFontAlign(0, -1, 0);
+  
+  // Title - centered
+  g.drawString("AUDIO INTERFACE", 88, 50);
 
   // Music info (if available)
-  if (lastMusicInfo) {
-    // Artist
-    g.setColor(color2);
-    g.drawString("ARTIST:", 15, 50);
+  if (lastMusicInfo && (lastMusicInfo.artist || lastMusicInfo.track)) {
+    // Artist - centered, larger
     g.setColor(cWhite);
-    let artist = lastMusicInfo.artist || "Unknown";
-    if (artist.length > 12) artist = artist.substring(0, 12) + "...";
-    g.drawString(artist, 15, 70);
+    g.setFontAlign(0, -1, 0);
+    let artist = lastMusicInfo.artist || "Unknown Artist";
+    if (artist.length > 18) artist = artist.substring(0, 18) + "...";
+    g.drawString(artist, 88, 90);
     
-    // Track
+    // Track - centered, larger
     g.setColor(color3);
-    g.drawString("TRACK:", 15, 95);
-    g.setColor(cWhite);
-    let track = lastMusicInfo.track || "Unknown";
-    if (track.length > 12) track = track.substring(0, 12) + "...";
-    g.drawString(track, 15, 115);
+    let track = lastMusicInfo.track || "Unknown Track";
+    if (track.length > 18) track = track.substring(0, 18) + "...";
+    g.drawString(track, 88, 110);
     
-    // Progress bar (if duration available)
+    // Progress bar - centered and wider
     if (lastMusicInfo.dur && lastMusicInfo.c) {
       let progress = lastMusicInfo.c / lastMusicInfo.dur;
+      let barWidth = 130;
+      let barX = (176 - barWidth) / 2;
+      
       g.setColor(color1);
-      g.fillRect(15, 135, 15 + Math.round(progress * 120), 145);
+      g.fillRect(barX, 130, barX + Math.round(progress * barWidth), 140);
       g.setColor(cGrey);
-      g.fillRect(15 + Math.round(progress * 120), 135, 135, 145);
+      g.fillRect(barX + Math.round(progress * barWidth), 130, barX + barWidth, 140);
+      
+      // Time display
+      let currentTime = Math.floor(lastMusicInfo.c / 60) + ":" + 
+                       ("0" + Math.floor(lastMusicInfo.c % 60)).substr(-2);
+      let totalTime = Math.floor(lastMusicInfo.dur / 60) + ":" + 
+                     ("0" + Math.floor(lastMusicInfo.dur % 60)).substr(-2);
+      g.setColor(cWhite);
+      g.drawString(currentTime + " / " + totalTime, 88, 150);
     }
   } else {
     g.setColor(cGrey);
-    g.drawString("NO MUSIC PLAYING", 15, 70);
+    g.setFontAlign(0, -1, 0);
+    g.drawString("NO MUSIC", 88, 90);
+    g.drawString("PLAYING", 88, 110);
   }
   
-  // Control instructions
+  // Touch zone instructions
   g.setColor(cGrey);
   g.setFontAlign(0, -1, 0);
-  g.drawString("TAP: PLAY/PAUSE", 88, 155);
-  g.drawString("TOP/BOT: PREV/NEXT", 88, 170);
+  g.drawString("TOP:PREV MID:PLAY BOT:NEXT", 88, 170);
 };
 
 let draw = function(){
@@ -771,21 +777,21 @@ let onTouch = function(btn, e){
       return;
     }
   } else if (lcarsViewPos == 1){
-    // Music control screen
-    if (is_upper) {
-      feedback();
+    // Music control screen - clearer touch zones
+    feedback();
+    
+    // Divide screen into 3 clear horizontal sections
+    if (e.y < 60) {
+      // Top third = previous
       Bangle.musicControl("previous");
-      return;
-    } else if (is_lower) {
-      feedback();
+    } else if (e.y > 120) {
+      // Bottom third = next  
       Bangle.musicControl("next");
-      return;
     } else {
-      // Center tap = play/pause
-      feedback();
+      // Middle third = play/pause
       Bangle.musicControl("play");
-      return;
     }
+    return;
   }
 };
 // Touch gestures to control clock. We don't use swipe to be compatible with the bangle ecosystem
