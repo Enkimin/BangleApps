@@ -1,0 +1,21 @@
+{
+  "id": "lcars_music",
+  "name": "LCARS Music",
+  "shortName":"LCARS Music",
+  "icon": "lcars.png",
+  "version":"1.0",
+  "readme": "README.md",
+  "supports": ["BANGLEJS2"],
+  "description": "LCARS clock with music control. Screen 2 shows current track and provides play/pause/next/previous controls via Gadgetbridge.",
+  "type": "clock",
+  "tags": "clock,music",
+  "screenshots": [
+    {"url":"screenshot_1.png"},
+    {"url":"screenshot_2.png"}],
+  "storage": [
+    {"name":"lcars_music.app.js","url":"lcars_music.app.js"},
+    {"name":"lcars_music.img","url":"lcars_music.icon.js","evaluate":true},
+    {"name":"lcars_music.settings.js","url":"lcars_music.settings.js"}
+  ],
+  "data":[{"name":"lcars_music.setting.json"}]
+}
