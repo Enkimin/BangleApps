@@ -803,6 +803,12 @@ let onMusicState = function(state) {
   if (!lastMusicInfo) lastMusicInfo = {};
   lastMusicInfo.state = state;
   
+  // Force update even if no track info for audiobooks
+  if (!lastMusicInfo.artist && !lastMusicInfo.track && state) {
+    lastMusicInfo.artist = "Audio Playing";
+    lastMusicInfo.track = state.includes && state.includes('pause') ? "Paused" : "Playing";
+  }
+  
   if (lcarsViewPos === 1) {
     draw();
   }
@@ -810,6 +816,15 @@ let onMusicState = function(state) {
 
 let onMusicTrack = function(track) {
   lastMusicInfo = track;
+  
+  // Handle cases where track info is minimal (like audiobooks)
+  if (track && !track.artist && !track.track) {
+    if (track.title) {
+      lastMusicInfo.track = track.title;
+      lastMusicInfo.artist = "Audiobook";
+    }
+  }
+  
   if (lcarsViewPos === 1) {
     draw();
   }
