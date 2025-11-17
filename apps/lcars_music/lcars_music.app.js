@@ -781,13 +781,13 @@ let onTouch = function(btn, e){
     // Divide screen into 3 clear horizontal sections
     if (e.y < 60) {
       // Top third = previous
-      Bangle.musicControl("previous");
+      sendMusicCommand("previous");
     } else if (e.y > 120) {
       // Bottom third = next  
-      Bangle.musicControl("next");
+      sendMusicCommand("next");
     } else {
-      // Middle third = play/pause
-      Bangle.musicControl("playpause");
+      // Middle third = play/pause (using gbmusic approach)
+      sendMusicCommand("playpause");
     }
     return;
   }
@@ -795,25 +795,42 @@ let onTouch = function(btn, e){
 // Touch gestures to control clock. We don't use swipe to be compatible with the bangle ecosystem
 Bangle.on('touch', onTouch);
 
-// Music event handlers - back to working approach
-let onMusicState = function(state) {
-  if (!lastMusicInfo) lastMusicInfo = {};
-  lastMusicInfo.state = state;
+// Music command function (gbmusic approach)
+function sendMusicCommand(command) {
+  // Detect whether we're using an emulator
+  if (typeof Bluetooth === "undefined" || typeof Bluetooth.println === "undefined") {
+    Bluetooth = {
+      println: (line) => { console.log("Bluetooth:", line); },
+    };
+  }
   
-  if (lcarsViewPos === 1) {
-    draw();
-  }
-};
+  Bluetooth.println("");
+  Bluetooth.println(JSON.stringify({t: "music", n: command}));
+}
 
-let onMusicTrack = function(track) {
-  lastMusicInfo = track;
-  if (lcarsViewPos === 1) {
-    draw();
+// Load music info from gbmusic storage
+function loadMusicInfo() {
+  try {
+    let saved = require("Storage").readJSON("gbmusic.load.json", true);
+    if (saved && saved.info) {
+      lastMusicInfo = saved.info;
+      if (saved.state) {
+        lastMusicInfo.state = saved.state.state;
+      }
+      if (lcarsViewPos === 1) {
+        draw();
+      }
+    }
+  } catch(ex) {
+    // No saved music info available
   }
-};
+}
 
-Bangle.on('musicstate', onMusicState);
-Bangle.on('musictrack', onMusicTrack);
+// Check for music info periodically 
+let musicInfoTimer;
+function startMusicInfoCheck() {
+  musicInfoTimer = setInterval(loadMusicInfo, 2000); // Check every 2 seconds
+}
 
 let themeBefore = g.theme;
 /*
@@ -828,13 +845,20 @@ Bangle.setUI({mode:"clock",remove:function() {
     Bangle.removeListener("lock",onLock);
     Bangle.removeListener("charging",onCharge);
     Bangle.removeListener("touch",onTouch);
-    Bangle.removeListener("musicstate",onMusicState);
-    Bangle.removeListener("musictrack",onMusicTrack);
+    if (musicInfoTimer) {
+      clearInterval(musicInfoTimer);
+      musicInfoTimer = undefined;
+    }
     try{ require('sched').setAlarm(TIMER_IDX, undefined); } catch(ex){ }
     g.setTheme(themeBefore);
     widget_utils.cleanup();
 }});
 Bangle.loadWidgets();
+
+// Start checking for music info from gbmusic
+startMusicInfoCheck();
+loadMusicInfo(); // Load immediately
+
 // Clear the screen once, at startup and draw clock
 g.setTheme({bg:"#000",fg:"#fff",dark:true}).clear();
 draw();
