@@ -798,40 +798,37 @@ let onTouch = function(btn, e){
 // Touch gestures to control clock. We don't use swipe to be compatible with the bangle ecosystem
 Bangle.on('touch', onTouch);
 
-// Music event handlers
-let onMusicState = function(state) {
-  if (!lastMusicInfo) lastMusicInfo = {};
-  lastMusicInfo.state = state;
-  
-  // Force update even if no track info for audiobooks
-  if (!lastMusicInfo.artist && !lastMusicInfo.track && state) {
-    lastMusicInfo.artist = "Audio Playing";
-    lastMusicInfo.track = state.includes && state.includes('pause') ? "Paused" : "Playing";
-  }
-  
-  if (lcarsViewPos === 1) {
-    draw();
-  }
-};
-
-let onMusicTrack = function(track) {
-  lastMusicInfo = track;
-  
-  // Handle cases where track info is minimal (like audiobooks)
-  if (track && !track.artist && !track.track) {
-    if (track.title) {
-      lastMusicInfo.track = track.title;
-      lastMusicInfo.artist = "Audiobook";
+// Music event handlers (using message system like simplemusic)
+let onMusicMessage = function(type, message) {
+  if (type.includes("music") && !message.handled) {
+    if (!lastMusicInfo) lastMusicInfo = {};
+    
+    // Update track info
+    if (message.track) lastMusicInfo.track = message.track;
+    if (message.artist) lastMusicInfo.artist = message.artist;
+    if (message.album) lastMusicInfo.album = message.album;
+    if (message.dur) lastMusicInfo.dur = message.dur;
+    if (message.c) lastMusicInfo.c = message.c;
+    if (message.position) lastMusicInfo.c = message.position;
+    if (message.state) lastMusicInfo.state = message.state;
+    
+    // Handle case where we have minimal info
+    if (!lastMusicInfo.artist && !lastMusicInfo.track) {
+      if (message.state === "play") {
+        lastMusicInfo.artist = "Audio";
+        lastMusicInfo.track = "Playing";
+      }
     }
-  }
-  
-  if (lcarsViewPos === 1) {
-    draw();
+    
+    if (lcarsViewPos === 1) {
+      draw();
+    }
+    
+    message.handled = true;
   }
 };
 
-Bangle.on('musicstate', onMusicState);
-Bangle.on('musictrack', onMusicTrack);
+Bangle.on("message", onMusicMessage);
 
 let themeBefore = g.theme;
 /*
@@ -846,13 +843,17 @@ Bangle.setUI({mode:"clock",remove:function() {
     Bangle.removeListener("lock",onLock);
     Bangle.removeListener("charging",onCharge);
     Bangle.removeListener("touch",onTouch);
-    Bangle.removeListener("musicstate",onMusicState);
-    Bangle.removeListener("musictrack",onMusicTrack);
+    Bangle.removeListener("message",onMusicMessage);
     try{ require('sched').setAlarm(TIMER_IDX, undefined); } catch(ex){ }
     g.setTheme(themeBefore);
     widget_utils.cleanup();
 }});
 Bangle.loadWidgets();
+
+// Goad Gadgetbridge into sending current track info (like simplemusic does)
+Bangle.musicControl("volumeup");
+Bangle.musicControl("volumedown");
+
 // Clear the screen once, at startup and draw clock
 g.setTheme({bg:"#000",fg:"#fff",dark:true}).clear();
 draw();
