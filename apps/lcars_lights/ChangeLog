@@ -1,0 +1,52 @@
+1.0: LCARS Lights Control - Initial Release
+* Complete rewrite of original LCARS clock for smart home control
+* BATTERY SAFETY: Aggressive power optimization with smart polling
+* Home Assistant integration with REST API and Bearer token auth
+* Control up to 6 lights with on/off status and brightness display
+* Music control screen with Gadgetbridge integration (Spotify, etc.)
+* Three screens: Clock, Light Control, Music Control
+* Navigation via left/right swipe between screens
+* Touch controls: tap lights to toggle, tap music controls
+* LCARS authentic design with rounded end caps and themed colors
+* Configurable polling intervals (30-300 seconds, default: 120s)
+* Automatic offline mode after connection failures
+* Screen-aware polling (only when light screen active and LCD on)
+* Efficient display updates with caching to prevent unnecessary redraws
+* Comprehensive settings interface with Home Assistant configuration
+* Quick setup examples and detailed battery optimization tips
+* Error handling with exponential backoff and connection reset
+* Proper cleanup of all intervals and timers on app exit
+* Support for both local and cloud Home Assistant instances
+* Weather display from Gadgetbridge (temperature, humidity)
+* Battery indicator with visual progress bar
+* Random planet images (Earth, Mars, Moon, Saturn)
+* Fullscreen mode support with widget hiding
+* 35+ configurable color themes plus random color mode
+* Complete documentation with setup guide and troubleshooting
+* Expected battery life: 24+ hours with normal usage
+* HTTP/HTTPS support for secure HA connections
+* Entity ID validation and smart parsing
+* Connection status indicators (ONLINE/OFFLINE)
+* Manual connection retry by tapping offline status
+* Music progress tracking with time display
+* Artist, track, album information display
+* Play/pause, next/previous track controls
+* Compatible with any music app supporting Gadgetbridge
+* Light entity support for standard Home Assistant light entities
+* Real-time brightness levels shown as LCARS progress bars
+* Touch zones for intuitive light and music control
+* Settings include battery tips and Home Assistant setup help
+* Maintains original LCARS planet rotation and visual elements
+* Memory-efficient implementation with minimal allocations
+* Network timeout protection (5 second max per request)
+* Smart failure detection stops polling after 3 consecutive failures
+* Zero network activity when screen off or on non-HA screens
+* Display caching prevents redundant screen updates
+* Proper font cleanup and event listener removal
+* Compatible with Bangle.js 2 (176x176 screen)
+* Based on original LCARS app but completely rewritten for smart home use
+
+ORIGINAL LCARS CLOCK HISTORY:
+0.01-0.32: Original LCARS clock development by David Peer and contributors
+* Features included: alarms, health tracking, weather, theming
+* See original LCARS app for detailed version history

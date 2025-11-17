@@ -1,0 +1,23 @@
+{
+  "id": "lcars_lights",
+  "name": "LCARS Lights Control",
+  "shortName": "LCARS Lights",
+  "icon": "lcars.png",
+  "version": "1.0",
+  "readme": "README.md",
+  "supports": ["BANGLEJS2"],
+  "description": "LCARS-themed watch face with Home Assistant light control and music interface. Battery-optimized for all-day use.",
+  "type": "clock",
+  "tags": "clock,smart home,home assistant,music,lights",
+  "screenshots": [
+    {"url":"screenshot_1.png"},
+    {"url":"screenshot_2.png"},
+    {"url":"screenshot_3.png"}
+  ],
+  "storage": [
+    {"name":"lcars_lights.app.js","url":"lcars_lights.app.js"},
+    {"name":"lcars_lights.img","url":"lcars_lights.icon.js","evaluate":true},
+    {"name":"lcars_lights.settings.js","url":"lcars_lights.settings.js"}
+  ],
+  "data":[{"name":"lcars_lights.setting.json"}]
+}
