@@ -511,10 +511,8 @@ let drawPosition1 = function(){
   let offset = settings.fullscreen ? 0 : 24;
   g.drawImage(bgLeft, 0, offset);
   
-  // Single unified panel background
-  drawHorizontalBgLine(color1, 25, 150, offset, 4);
-  drawHorizontalBgLine(color2, 20, 155, 40, 4);
-  drawHorizontalBgLine(color3, 25, 150, 80, 4);
+  // Single LCARS border around music area
+  drawHorizontalBgLine(color2, 30, 146, 90, 4);
 
   // Music Control Interface - cleaner layout (v1.7 - title removed)
   g.setFontAntonioMedium();
@@ -523,29 +521,29 @@ let drawPosition1 = function(){
   
   // Music info (if available)
   if (lastMusicInfo && (lastMusicInfo.artist || lastMusicInfo.track)) {
-    // Artist - centered, larger
+    // Artist - centered, proper spacing
     g.setColor(cWhite);
     g.setFontAlign(0, -1, 0);
     let artist = lastMusicInfo.artist || "Unknown Artist";
     if (artist.length > 18) artist = artist.substring(0, 18) + "...";
-    g.drawString(artist, 88, 70);
+    g.drawString(artist, 88, 100);
     
-    // Track - centered, larger
+    // Track - centered, proper spacing
     g.setColor(color3);
     let track = lastMusicInfo.track || "Unknown Track";
     if (track.length > 18) track = track.substring(0, 18) + "...";
-    g.drawString(track, 88, 90);
+    g.drawString(track, 88, 120);
     
     // Progress bar - centered and wider
     if (lastMusicInfo.dur && lastMusicInfo.c) {
       let progress = lastMusicInfo.c / lastMusicInfo.dur;
-      let barWidth = 130;
+      let barWidth = 120;
       let barX = (176 - barWidth) / 2;
       
       g.setColor(color1);
-      g.fillRect(barX, 110, barX + Math.round(progress * barWidth), 120);
+      g.fillRect(barX, 140, barX + Math.round(progress * barWidth), 150);
       g.setColor(cGrey);
-      g.fillRect(barX + Math.round(progress * barWidth), 110, barX + barWidth, 120);
+      g.fillRect(barX + Math.round(progress * barWidth), 140, barX + barWidth, 150);
       
       // Time display
       let currentTime = Math.floor(lastMusicInfo.c / 60) + ":" + 
@@ -553,13 +551,13 @@ let drawPosition1 = function(){
       let totalTime = Math.floor(lastMusicInfo.dur / 60) + ":" + 
                      ("0" + Math.floor(lastMusicInfo.dur % 60)).substr(-2);
       g.setColor(cWhite);
-      g.drawString(currentTime + " / " + totalTime, 88, 130);
+      g.drawString(currentTime + " / " + totalTime, 88, 160);
     }
   } else {
     g.setColor(cGrey);
     g.setFontAlign(0, -1, 0);
-    g.drawString("NO MUSIC", 88, 70);
-    g.drawString("PLAYING", 88, 90);
+    g.drawString("NO MUSIC", 88, 100);
+    g.drawString("PLAYING", 88, 120);
   }
   
   // Touch zone instructions
@@ -803,6 +801,9 @@ let onMusicMessage = function(type, message) {
   if (type.includes("music") && !message.handled) {
     if (!lastMusicInfo) lastMusicInfo = {};
     
+    // Debug: Show what we received (temporary)
+    console.log("Music message:", type, message);
+    
     // Update track info
     if (message.track) lastMusicInfo.track = message.track;
     if (message.artist) lastMusicInfo.artist = message.artist;
@@ -812,12 +813,10 @@ let onMusicMessage = function(type, message) {
     if (message.position) lastMusicInfo.c = message.position;
     if (message.state) lastMusicInfo.state = message.state;
     
-    // Handle case where we have minimal info
-    if (!lastMusicInfo.artist && !lastMusicInfo.track) {
-      if (message.state === "play") {
-        lastMusicInfo.artist = "Audio";
-        lastMusicInfo.track = "Playing";
-      }
+    // Handle case where we have minimal info but we know something is playing
+    if (message.state === "play" && !lastMusicInfo.artist && !lastMusicInfo.track) {
+      lastMusicInfo.artist = "Audio";
+      lastMusicInfo.track = "Playing";
     }
     
     if (lcarsViewPos === 1) {
