@@ -511,58 +511,34 @@ let drawPosition1 = function(){
   let offset = settings.fullscreen ? 0 : 24;
   g.drawImage(bgLeft, 0, offset);
   
-  // Clean music area - no extra lines
-
-  // Music Control Interface - cleaner layout (v1.7 - title removed)
+  // LCARS Music Remote Control Interface
   g.setFontAntonioMedium();
+  
+  // Draw three clear LCARS-style touch zones
+  
+  // TOP ZONE - Previous Track (y = 0 to 60)
+  g.setColor(color1);
+  g.fillRect(30, offset + 20, 146, offset + 55);
+  g.setColor(cBlack);
+  g.setFontAlign(0, -1, 0);
+  g.drawString("< PREVIOUS", 88, offset + 30);
+  
+  // MIDDLE ZONE - Play/Pause (y = 60 to 120) 
   g.setColor(color2);
-  g.setFontAlign(0, -1, 0);
+  g.fillRect(30, offset + 65, 146, offset + 100);
+  g.setColor(cBlack);
+  g.drawString("PLAY / PAUSE", 88, offset + 75);
   
-  // Music info (if available)
-  if (lastMusicInfo && (lastMusicInfo.artist || lastMusicInfo.track)) {
-    // Artist - centered, proper spacing
-    g.setColor(cWhite);
-    g.setFontAlign(0, -1, 0);
-    let artist = lastMusicInfo.artist || "Unknown Artist";
-    if (artist.length > 18) artist = artist.substring(0, 18) + "...";
-    g.drawString(artist, 88, 100);
-    
-    // Track - centered, proper spacing
-    g.setColor(color3);
-    let track = lastMusicInfo.track || "Unknown Track";
-    if (track.length > 18) track = track.substring(0, 18) + "...";
-    g.drawString(track, 88, 120);
-    
-    // Progress bar - centered and wider
-    if (lastMusicInfo.dur && lastMusicInfo.c) {
-      let progress = lastMusicInfo.c / lastMusicInfo.dur;
-      let barWidth = 120;
-      let barX = (176 - barWidth) / 2;
-      
-      g.setColor(color1);
-      g.fillRect(barX, 140, barX + Math.round(progress * barWidth), 150);
-      g.setColor(cGrey);
-      g.fillRect(barX + Math.round(progress * barWidth), 140, barX + barWidth, 150);
-      
-      // Time display
-      let currentTime = Math.floor(lastMusicInfo.c / 60) + ":" + 
-                       ("0" + Math.floor(lastMusicInfo.c % 60)).substr(-2);
-      let totalTime = Math.floor(lastMusicInfo.dur / 60) + ":" + 
-                     ("0" + Math.floor(lastMusicInfo.dur % 60)).substr(-2);
-      g.setColor(cWhite);
-      g.drawString(currentTime + " / " + totalTime, 88, 160);
-    }
-  } else {
-    g.setColor(cGrey);
-    g.setFontAlign(0, -1, 0);
-    g.drawString("NO MUSIC", 88, 100);
-    g.drawString("PLAYING", 88, 120);
-  }
+  // BOTTOM ZONE - Next Track (y = 120 to 176)
+  g.setColor(color3);
+  g.fillRect(30, offset + 110, 146, offset + 145);
+  g.setColor(cBlack);
+  g.drawString("NEXT >", 88, offset + 120);
   
-  // Touch zone instructions
-  g.setColor(cGrey);
+  // Status text at bottom
+  g.setColor(cWhite);
   g.setFontAlign(0, -1, 0);
-  g.drawString("TOP:PREV MID:PLAY BOT:NEXT", 88, 170);
+  g.drawString("MUSIC REMOTE", 88, offset + 155);
 };
 
 let draw = function(){
@@ -795,41 +771,9 @@ let onTouch = function(btn, e){
 // Touch gestures to control clock. We don't use swipe to be compatible with the bangle ecosystem
 Bangle.on('touch', onTouch);
 
-// Music command function (gbmusic approach)
+// Simple music control - no detection, just remote control
 function sendMusicCommand(command) {
-  // Detect whether we're using an emulator
-  if (typeof Bluetooth === "undefined" || typeof Bluetooth.println === "undefined") {
-    Bluetooth = {
-      println: (line) => { console.log("Bluetooth:", line); },
-    };
-  }
-  
-  Bluetooth.println("");
-  Bluetooth.println(JSON.stringify({t: "music", n: command}));
-}
-
-// Load music info from gbmusic storage
-function loadMusicInfo() {
-  try {
-    let saved = require("Storage").readJSON("gbmusic.load.json", true);
-    if (saved && saved.info) {
-      lastMusicInfo = saved.info;
-      if (saved.state) {
-        lastMusicInfo.state = saved.state.state;
-      }
-      if (lcarsViewPos === 1) {
-        draw();
-      }
-    }
-  } catch(ex) {
-    // No saved music info available
-  }
-}
-
-// Check for music info periodically 
-let musicInfoTimer;
-function startMusicInfoCheck() {
-  musicInfoTimer = setInterval(loadMusicInfo, 2000); // Check every 2 seconds
+  Bangle.musicControl(command);
 }
 
 let themeBefore = g.theme;
@@ -845,20 +789,12 @@ Bangle.setUI({mode:"clock",remove:function() {
     Bangle.removeListener("lock",onLock);
     Bangle.removeListener("charging",onCharge);
     Bangle.removeListener("touch",onTouch);
-    if (musicInfoTimer) {
-      clearInterval(musicInfoTimer);
-      musicInfoTimer = undefined;
-    }
+    // Clean music remote interface
     try{ require('sched').setAlarm(TIMER_IDX, undefined); } catch(ex){ }
     g.setTheme(themeBefore);
     widget_utils.cleanup();
 }});
 Bangle.loadWidgets();
-
-// Start checking for music info from gbmusic
-startMusicInfoCheck();
-loadMusicInfo(); // Load immediately
-
 // Clear the screen once, at startup and draw clock
 g.setTheme({bg:"#000",fg:"#fff",dark:true}).clear();
 draw();
