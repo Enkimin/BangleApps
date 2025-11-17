@@ -516,7 +516,7 @@ let drawPosition1 = function(){
   drawHorizontalBgLine(color2, 20, 155, 40, 4);
   drawHorizontalBgLine(color3, 25, 150, 80, 4);
 
-  // Music Control Interface - cleaner layout
+  // Music Control Interface - cleaner layout (v1.7 - title removed)
   g.setFontAntonioMedium();
   g.setColor(color2);
   g.setFontAlign(0, -1, 0);
