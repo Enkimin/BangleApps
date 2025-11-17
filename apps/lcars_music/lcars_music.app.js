@@ -518,26 +518,21 @@ let drawPosition1 = function(){
 
   // Music Control Interface - cleaner layout
   g.setFontAntonioMedium();
-  g.setColor(color2);
-  g.setFontAlign(0, -1, 0);
-  
-  // Title - centered
-  g.drawString("AUDIO INTERFACE", 88, 50);
 
-  // Music info (if available)
-  if (lastMusicInfo && (lastMusicInfo.artist || lastMusicInfo.track)) {
-    // Artist - centered, larger
+  // Music info (if available) - moved up since we removed title  
+  if (lastMusicInfo) {
+    // Artist/Author - centered, larger
     g.setColor(cWhite);
     g.setFontAlign(0, -1, 0);
-    let artist = lastMusicInfo.artist || "Unknown Artist";
+    let artist = lastMusicInfo.artist || lastMusicInfo.album || "";
     if (artist.length > 18) artist = artist.substring(0, 18) + "...";
-    g.drawString(artist, 88, 90);
+    if (artist) g.drawString(artist, 88, 70);
     
-    // Track - centered, larger
+    // Track/Chapter - centered, larger
     g.setColor(color3);
-    let track = lastMusicInfo.track || "Unknown Track";
+    let track = lastMusicInfo.track || "";
     if (track.length > 18) track = track.substring(0, 18) + "...";
-    g.drawString(track, 88, 110);
+    if (track) g.drawString(track, 88, 95);
     
     // Progress bar - centered and wider
     if (lastMusicInfo.dur && lastMusicInfo.c) {
@@ -546,9 +541,9 @@ let drawPosition1 = function(){
       let barX = (176 - barWidth) / 2;
       
       g.setColor(color1);
-      g.fillRect(barX, 130, barX + Math.round(progress * barWidth), 140);
+      g.fillRect(barX, 120, barX + Math.round(progress * barWidth), 130);
       g.setColor(cGrey);
-      g.fillRect(barX + Math.round(progress * barWidth), 130, barX + barWidth, 140);
+      g.fillRect(barX + Math.round(progress * barWidth), 120, barX + barWidth, 130);
       
       // Time display
       let currentTime = Math.floor(lastMusicInfo.c / 60) + ":" + 
@@ -556,13 +551,13 @@ let drawPosition1 = function(){
       let totalTime = Math.floor(lastMusicInfo.dur / 60) + ":" + 
                      ("0" + Math.floor(lastMusicInfo.dur % 60)).substr(-2);
       g.setColor(cWhite);
-      g.drawString(currentTime + " / " + totalTime, 88, 150);
+      g.drawString(currentTime + " / " + totalTime, 88, 145);
     }
   } else {
     g.setColor(cGrey);
     g.setFontAlign(0, -1, 0);
-    g.drawString("NO MUSIC", 88, 90);
-    g.drawString("PLAYING", 88, 110);
+    g.drawString("NO MUSIC", 88, 80);
+    g.drawString("PLAYING", 88, 105);
   }
   
   // Touch zone instructions
@@ -808,7 +803,8 @@ let onMusicState = function(state) {
 };
 
 let onMusicTrack = function(track) {
-  lastMusicInfo = track;
+  // Accept any track info, even if incomplete  
+  lastMusicInfo = track || {};
   if (lcarsViewPos === 1) {
     draw();
   }
